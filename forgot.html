@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker - Reset Password</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #61a6eb; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card-wrapper { position: relative; margin-top: 60px; width: 100%; max-width: 400px; padding: 0 20px; }
+        .icon-circle { position: absolute; top: -45px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; background-color: #3b44a0; border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 10; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+        .icon-circle i { color: #ffffff; font-size: 35px; transform: rotate(-45deg); }
+        .reset-card { background-color: #ffffff; width: 100%; padding: 60px 40px 40px 40px; box-shadow: 25px 25px 0px rgba(0, 0, 0, 0.08); position: relative; z-index: 1; }
+        h2 { text-align: center; color: #3b44a0; font-size: 24px; font-weight: 600; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; color: #3b44a0; font-size: 12px; font-weight: 500; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 10px 12px; border: 1px solid #d1d1d1; outline: none; font-size: 14px; color: #333; background-color: #fbfbfb; transition: border-color 0.3s; }
+        .input-group input:focus { border-color: #3b44a0; background-color: #fff; }
+        .input-group input::placeholder { color: #cccccc; }
+        .error-message { color: #e74c3c; font-size: 11px; margin-top: 5px; display: none; }
+        .action-buttons { display: flex; align-items: center; gap: 15px; margin-top: 30px; }
+        .btn-continue { background-color: #3b44a0; color: #ffffff; border: none; padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.3s; }
+        .btn-continue:hover { opacity: 0.9; }
+        .btn-cancel { background: none; border: none; color: #3b44a0; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.3s; }
+        .btn-cancel:hover { color: #2a3178; text-decoration: underline; }
+        @media (max-width: 480px) { .reset-card { box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.08); padding: 60px 25px 30px 25px; } }
+    </style>
+</head>
+<body>
+
+    <div class="card-wrapper">
+        <div class="icon-circle">
+            <i class="fas fa-key"></i>
+        </div>
+        
+        <div class="reset-card">
+            <h2>Reset Password</h2>
+            
+            <form id="resetPasswordForm">
+                <div class="input-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="Password" required minlength="6">
+                </div>
+                
+                <div class="input-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Password" required>
+                    <div class="error-message" id="matchError">Passwords do not match!</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn-continue" onclick="handlePasswordReset()">Continue</button>
+                    <button type="button" class="btn-cancel" onclick="handleCancel()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function handlePasswordReset() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            const errorMsg = document.getElementById('matchError');
+
+            errorMsg.style.display = 'none';
+
+            if (newPass === "" || confirmPass === "") {
+                alert("Please fill in both password fields.");
+                return;
+            }
+
+            if (newPass.length < 6) {
+                alert("Password must be at least 6 characters long.");
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                errorMsg.style.display = 'block';
+                document.getElementById('confirmPassword').focus();
+                return;
+            }
+
+            // SUCCESS HONEY PAR:
+            alert("Password has been successfully reset!\nRedirecting to Login...");
+            
+            // YEH LINE USER KO LOGIN PAGE PAR BHEJEGI 👇
+            window.location.href = "login.html";
+        }
+
+        function handleCancel() {
+            // CANCEL DABANE PAR BHI LOGIN PAGE PAR BHEJEGI 👇
+            window.location.href = "login.html";
+        }
+    </script>
+
+</body>
+</html>

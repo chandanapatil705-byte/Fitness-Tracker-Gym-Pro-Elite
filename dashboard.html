@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymPro Elite Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --bg: #f8fafc;
+            --dark: #1e293b;
+            --white: #ffffff;
+        }
+
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; overflow: hidden; }
+        .app-container { display: flex; height: 100vh; width: 100vw; }
+
+        /* Sidebar Navigation */
+        .sidebar { width: 260px; background: var(--dark); color: white; padding: 25px; display: flex; flex-direction: column; }
+        .logo { font-size: 26px; font-weight: 600; margin-bottom: 40px; color: var(--secondary); display: flex; align-items: center; gap: 10px; }
+        .nav-menu { list-style: none; padding: 0; flex: 1; }
+        .nav-item { padding: 12px 15px; cursor: pointer; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; gap: 12px; color: #cbd5e1; }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+        .logout-btn { color: #f87171; border-top: 1px solid #334155; padding-top: 20px; cursor: pointer; margin-top: auto; }
+
+        /* Main Content Layout */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; height: 100vh; box-sizing: border-box; }
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .profile-area { display: flex; align-items: center; gap: 15px; }
+        .profile-img-container { 
+            width: 45px; height: 45px; border-radius: 50%; 
+            border: 2px solid var(--primary); overflow: hidden; 
+            cursor: pointer; position: relative; transition: 0.3s;
+        }
+        .profile-img-container img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Profile Modal & Photo Upload */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .profile-card {
+            background: white; padding: 30px; border-radius: 20px; width: 350px;
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s ease;
+        }
+        .photo-edit-container { position: relative; width: 100px; height: 100px; margin: 0 auto 15px; cursor: pointer; }
+        .photo-edit-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
+        .photo-edit-container .edit-icon { 
+            position: absolute; bottom: 0; right: 0; background: var(--primary); 
+            color: white; width: 30px; height: 30px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .video-card iframe { width: 100%; height: 200px; border-radius: 12px; border: none; }
+
+        .contact-form input, .contact-form textarea { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #ddd; font-family: inherit; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .info-label { font-weight: 600; color: #64748b; }
+
+        .view-section { display: none; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .shadow-box { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.3s; width: 100%; }
+        .challenge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        
+        /* Playlist Styles */
+        .music-player-container { text-align: center; padding: 30px; }
+        .audio-wrapper { background: #f1f5f9; padding: 20px; border-radius: 15px; margin-top: 10px; }
+        .track-list { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; text-align: left; }
+        .track-item { background: white; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;}
+        .track-item:hover { background: var(--primary); color: white; }
+        .track-item i { font-size: 1.2rem; }
+
+        .chat-box { height: 350px; overflow-y: auto; background: #f9fafb; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 10px 15px; border-radius: 12px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        .bot-msg { background: #e0e7ff; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user-msg { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        .streak-gallery { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .streak-img { width: 100px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid var(--secondary); }
+    </style>
+</head>
+<body>
+
+    <div id="profileModal" class="modal-overlay" onclick="closeProfile()">
+        <div class="profile-card" onclick="event.stopPropagation()">
+            <div class="photo-edit-container" onclick="document.getElementById('profile-upload').click()">
+                <img id="modal-p-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+                <div class="edit-icon"><i class="fas fa-camera"></i></div>
+            </div>
+            <input type="file" id="profile-upload" hidden accept="image/*" onchange="previewProfilePhoto(this)">
+            
+            <h2 id="u-name" style="margin-bottom:10px;">User Profile</h2>
+            <div class="info-row"><span class="info-label">Full Name:</span> <span id="disp-fullname">Loading...</span></div>
+            <div class="info-row"><span class="info-label">Username:</span> <span id="disp-username">Loading...</span></div>
+            <div class="info-row"><span class="info-label">Email:</span> <span id="disp-email">Loading...</span></div>
+            <div class="info-row"><span class="info-label">Weight:</span> <span id="disp-weight">0 kg</span></div>
+            <div class="info-row"><span class="info-label">Height:</span> <span id="disp-height">0 cm</span></div>
+            <div class="info-row"><span class="info-label">Gender:</span> <span id="disp-gender">Not set</span></div>
+            <button class="close-modal" onclick="closeProfile()" style="margin-top: 20px; background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 10px; cursor: pointer;">Save & Close</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo"><i class="fas fa-dumbbell"></i> GymPro</div>
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="switchView('view-dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</li>
+                <li class="nav-item" onclick="switchView('view-streak', this)"><i class="fas fa-fire-alt"></i> Daily Streak</li>
+                <li class="nav-item" onclick="switchView('view-challenges', this)"><i class="fas fa-trophy"></i> Challenges</li>
+                <li class="nav-item" onclick="switchView('view-videos', this)"><i class="fas fa-play-circle"></i> Exercise Videos</li>
+                <li class="nav-item" onclick="switchView('view-message', this)"><i class="fas fa-robot"></i> AI Fitness Bot</li>
+                <li class="nav-item" onclick="switchView('view-goals', this)"><i class="fas fa-bullseye"></i> My Goals</li>
+                <li class="nav-item" onclick="switchView('view-help', this)"><i class="fas fa-headset"></i> Help & Contact</li>
+                <li class="nav-item" onclick="switchView('view-motivational', this)"><i class="fas fa-music"></i> My Playlist</li>
+            </ul>
+            <div class="nav-item logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <h3 id="welcome-text">Hello, User</h3>
+                <div class="profile-area">
+                    <div style="background: linear-gradient(45deg, #f97316, #fbbf24); color: white; padding: 5px 18px; border-radius: 50px; font-weight: bold; margin-right: 15px;">
+                        <i class="fas fa-fire"></i> <span id="streak-count-top">0</span>
+                    </div>
+                    <div class="profile-img-container" onclick="openProfile()">
+                        <img id="nav-p-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-dashboard" class="view-section active">
+                <h2>Progress Analysis</h2>
+                <div class="shadow-box"><canvas id="progressChart" style="height:250px"></canvas></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div class="shadow-box" style="background:var(--primary); color:white"><h4>Active Challenges</h4><h2 id="dash-ch-count">0</h2></div>
+                    <div class="shadow-box" style="background:var(--secondary); color:white"><h4>Calories Burnt</h4><h2 id="dash-calories">0</h2></div>
+                </div>
+            </div>
+
+            <div id="view-videos" class="view-section">
+                <h2>Exercise Library</h2>
+                <div class="video-grid" id="video-list"></div>
+            </div>
+
+            <div id="view-streak" class="view-section">
+                <h2>Daily Workout Streak</h2>
+                <div class="shadow-box" style="text-align: center;">
+                    <i class="fas fa-camera-retro" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 10px;"></i>
+                    <p>Upload your progress photo to maintain your streak!</p>
+                    <button class="btn-action" style="width: auto;" onclick="document.getElementById('s-up').click()">Upload Photo</button>
+                    <input type="file" id="s-up" hidden accept="image/*" onchange="handleStreak(this)">
+                    <div class="streak-gallery" id="s-gallery"></div>
+                </div>
+            </div>
+
+            <div id="view-challenges" class="view-section">
+                <h2>Elite Challenges</h2>
+                <div class="challenge-grid" id="challenge-list"></div>
+            </div>
+
+            <div id="view-motivational" class="view-section">
+                <h2>Workout Playlist</h2>
+                <div class="shadow-box music-player-container">
+                    <div class="audio-wrapper">
+                        <i class="fas fa-music fa-beat" style="font-size: 60px; color: var(--primary); margin-bottom: 15px;"></i>
+                        <h3 id="current-track-name">Select a Song</h3>
+                        <audio id="main-audio" controls style="width: 100%; margin-top: 10px;">
+                            <source id="audio-source" src="" type="audio/mpeg">
+                        </audio>
+                    </div>
+                    <div class="track-list" id="my-track-list">
+                        <div class="track-item" onclick="playSong('Shape of You - Ed Sheeran', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')">
+                            <span>🎸 Shape of You (Remix)</span> <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="track-item" onclick="playSong('Bad Habits - Ed Sheeran', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3')">
+                            <span>🧛 Bad Habits (Bass Boost)</span> <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="track-item" onclick="playSong('Believer - Imagine Dragons', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3')">
+                            <span>⚡ Believer (Gym Mix)</span> <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="track-item" onclick="playSong('Thunder - Imagine Dragons', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3')">
+                            <span>⛈️ Thunder (Workout Mix)</span> <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="track-item" onclick="playSong('Radioactive - Imagine Dragons', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3')">
+                            <span>☢️ Radioactive (Epic)</span> <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-help" class="view-section">
+                <h2>Support & Contact</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px;">
+                    <div class="shadow-box">
+                        <h3>Contact Info</h3>
+                        <p><i class="fas fa-envelope"></i> support@gympro.com</p>
+                        <p><i class="fas fa-phone"></i> +1 (234) 567-890</p>
+                    </div>
+                    <div class="shadow-box">
+                        <h3>Send a Message</h3>
+                        <form class="contact-form" onsubmit="event.preventDefault(); alert('Message Sent!'); this.reset();">
+                            <input type="text" placeholder="Your Name" required>
+                            <input type="email" placeholder="Your Email" required>
+                            <textarea rows="4" placeholder="How can we help?" required></textarea>
+                            <button type="submit" class="btn-action">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-message" class="view-section">
+                <h2>FitBot AI Trainer</h2>
+                <div class="shadow-box">
+                    <div class="chat-box" id="chat-box"></div>
+                    <div style="display:flex; gap:10px">
+                        <input type="text" id="chat-in" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd" placeholder="Ask tips..." onkeypress="handleChatKey(event)">
+                        <button class="btn-action" style="width: auto; padding: 0 25px;" onclick="askBot()">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-goals" class="view-section">
+                <h2>My Goals</h2>
+                <div class="shadow-box">
+                    <div style="display:flex; gap:10px; margin-bottom:20px">
+                        <input type="text" id="goal-in" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd" placeholder="New Goal...">
+                        <button class="btn-action" style="width: auto;" onclick="addGoal()">Add</button>
+                    </div>
+                    <div id="goal-list"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let streakCount = 0, myChart, activeChCount = 0, totalCals = 0;
+
+        // FIXED VIDEO IDs
+        const exerciseVideos = [
+            { title: "Zumba Party Mix", id: "HRkNfdlm5Qs", category: "zumba" },
+            { title: "Belly Fat Shred", id: "2MoGxae-zyo", category: "fatloss" },
+            { title: "Yoga for Beginners", id: "v7AYKMP6rOE", category: "Yoga" },
+            { title: "HIIT Tabata Session", id: "ml6cT4AZdqI", category: "Cardio" }
+        ];
+
+        const chData = [
+            { name: "Iron Lungs", desc: "Run 10km total this week.", icon: "fa-running", cal: 500 },
+            { name: "Hydration Pro", desc: "Drink 4L water daily for 5 days.", icon: "fa-tint", cal: 50 },
+            { name: "Power Plank", desc: "Hold plank for 4 minutes.", icon: "fa-clock", cal: 150 },
+            { name: "Warrior Weekend", desc: "100 Squats in 2 days.", icon: "fa-fist-raised", cal: 300 },
+            { name: "Morning Monk", desc: "Workout at 5 AM for 3 days.", icon: "fa-sun", cal: 200 },
+            { name: "Sugar Free", desc: "No sugar for 48 hours.", icon: "fa-apple-alt", cal: 100 },
+            { name: "Zen Master", desc: "15 min Meditation daily.", icon: "fa-om", cal: 50 },
+            { name: "Pushup King", desc: "50 Pushups in one go.", icon: "fa-bolt", cal: 250 },
+            { name: "Stair Master", desc: "500 steps today.", icon: "fa-arrow-up", cal: 400 },
+            { name: "Core Crusher", desc: "15 min Core Workout.", icon: "fa-shield-alt", cal: 180 }
+        ];
+
+        window.onload = function() {
+            renderChallenges();
+            renderVideos();
+            initChart();
+            loadUserData();
+        };
+
+        function playSong(name, url) {
+            const audio = document.getElementById('main-audio');
+            const source = document.getElementById('audio-source');
+            const title = document.getElementById('current-track-name');
+            
+            source.src = url;
+            title.innerText = "Playing: " + name;
+            audio.load();
+            audio.play();
+        }
+
+        function renderVideos() {
+            const list = document.getElementById('video-list');
+            list.innerHTML = exerciseVideos.map(video => `
+                <div class="shadow-box video-card">
+                    <h4>${video.title}</h4>
+                    <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
+                </div>
+            `).join('');
+        }
+
+        function renderChallenges() {
+            const chList = document.getElementById('challenge-list');
+            chList.innerHTML = chData.map(ch => `
+                <div class="shadow-box" style="text-align:center;">
+                    <div style="font-size: 2rem; color: var(--primary);"><i class="fas ${ch.icon}"></i></div>
+                    <h4>${ch.name}</h4><p style="font-size: 13px;">${ch.desc}</p>
+                    <button class="btn-action" style="margin-top:10px" onclick="acceptCh(this, ${ch.cal})">Accept</button>
+                </div>
+            `).join('');
+        }
+
+        function loadUserData() {
+            const user = {
+                fullName: localStorage.getItem('user_fullname') || "Chandana S.",
+                username: localStorage.getItem('user_username') || "chandana_fit",
+                email: localStorage.getItem('user_email') || "pro@gympro.com",
+                weight: localStorage.getItem('user_weight') || "0",
+                height: localStorage.getItem('user_height') || "0",
+                gender: localStorage.getItem('user_gender') || "Not specified"
+            };
+            document.getElementById('welcome-text').innerText = "Hello, " + user.fullName.split(' ')[0];
+            document.getElementById('disp-fullname').innerText = user.fullName;
+            document.getElementById('disp-username').innerText = user.username;
+            document.getElementById('disp-email').innerText = user.email;
+            document.getElementById('disp-weight').innerText = user.weight + " kg";
+            document.getElementById('disp-height').innerText = user.height + " cm";
+            document.getElementById('disp-gender').innerText = user.gender;
+            
+            const savedPhoto = localStorage.getItem('user_photo');
+            if(savedPhoto) {
+                document.getElementById('nav-p-img').src = savedPhoto;
+                document.getElementById('modal-p-img').src = savedPhoto;
+            }
+        }
+
+        function previewProfilePhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('nav-p-img').src = e.target.result;
+                    document.getElementById('modal-p-img').src = e.target.result;
+                    localStorage.setItem('user_photo', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{ label: 'Activity %', data: [0,0,0,0,0,0,0], borderColor: '#4f46e5', tension: 0.4, fill: true, backgroundColor: 'rgba(79, 70, 229, 0.1)' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+        }
+
+        function handleStreak(input) {
+            if (input.files && input.files[0]) {
+                streakCount++;
+                document.getElementById('streak-count-top').innerText = streakCount;
+                const dayIdx = (new Date().getDay() + 6) % 7;
+                myChart.data.datasets[0].data[dayIdx] = Math.min(myChart.data.datasets[0].data[dayIdx] + 25, 100);
+                myChart.update();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result; img.className = 'streak-img';
+                    document.getElementById('s-gallery').appendChild(img);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function askBot() {
+            const input = document.getElementById('chat-in'), chatBox = document.getElementById('chat-box');
+            if (!input.value.trim()) return;
+            chatBox.innerHTML += `<div class="message user-msg">${input.value}</div>`;
+            setTimeout(() => {
+                chatBox.innerHTML += `<div class="message bot-msg">Nice focus! Discipline is the key!</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 600);
+            input.value = "";
+        }
+
+        function handleChatKey(e) { if (e.key === 'Enter') askBot(); }
+
+        function acceptCh(btn, cal) {
+            btn.innerHTML = "Accepted ✅"; btn.disabled = true;
+            activeChCount++; totalCals += cal;
+            document.getElementById('dash-ch-count').innerText = activeChCount;
+            document.getElementById('dash-calories').innerText = totalCals.toLocaleString();
+        }
+
+        function addGoal() {
+            const v = document.getElementById('goal-in').value;
+            if(!v) return;
+            document.getElementById('goal-list').innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; background:#f3f4f6; border-radius:10px; margin-bottom:5px;"><span>${v}</span><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="this.parentElement.remove()"></i></div>`;
+            document.getElementById('goal-in').value = '';
+        }
+
+        function switchView(id, el) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function openProfile() { document.getElementById('profileModal').style.display = 'flex'; }
+        function closeProfile() { document.getElementById('profileModal').style.display = 'none'; }
+        function logoutUser() { if (confirm("Logout?")) window.location.href = "login.html"; }
+    </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, #6aa5e3, #a164c8); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: #ffffff; max-width: 700px; width: 100%; padding: 40px 50px; border-radius: 10px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); }
+        .title { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; position: relative; }
+        .title::before { content: ''; position: absolute; left: 0; bottom: -5px; height: 3px; width: 35px; border-radius: 5px; background: linear-gradient(135deg, #6aa5e3, #a164c8); }
+        .user-details { display: flex; flex-wrap: wrap; justify-content: space-between; }
+        .input-box { margin-bottom: 20px; width: calc(100% / 2 - 15px); }
+        .input-box label { display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 8px; }
+        .input-box input { height: 45px; width: 100%; outline: none; font-size: 14px; border-radius: 5px; padding-left: 15px; border: 1px solid #dcdcdc; transition: all 0.3s ease; }
+        .input-box input:focus, .input-box input:valid { border-color: #a164c8; }
+        .input-box input::placeholder { color: #b3b3b3; }
+        .gender-details { margin-top: 10px; margin-bottom: 25px; }
+        .gender-title { font-size: 16px; font-weight: 500; color: #333; margin-bottom: 10px; display: block; }
+        .category { display: flex; width: 80%; justify-content: space-between; align-items: center; }
+        .category label { display: flex; align-items: center; cursor: pointer; font-size: 14px; color: #555; }
+        .category label input { margin-right: 8px; accent-color: #a164c8; width: 16px; height: 16px; cursor: pointer; }
+        .button { height: 45px; margin-top: 20px; }
+        .button button { height: 100%; width: 100%; border-radius: 5px; border: none; color: #fff; font-size: 16px; font-weight: 500; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(135deg, #6aa5e3, #a164c8); }
+        .button button:hover { opacity: 0.9; transform: translateY(-2px); }
+        
+        /* New Styles for Sign In link */
+        .signin-link { margin-top: 25px; text-align: center; font-size: 14px; color: #333; }
+        .signin-link a { color: #a164c8; text-decoration: none; font-weight: 600; }
+        .signin-link a:hover { text-decoration: underline; }
+
+        .error-msg { color: #ff3333; font-size: 12px; margin-top: 5px; display: none; }
+        @media (max-width: 584px) { .container { max-width: 100%; padding: 30px 20px; } .input-box { margin-bottom: 15px; width: 100%; } .category { width: 100%; flex-direction: column; align-items: flex-start; gap: 10px; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="title">Registration</div>
+        
+        <form id="registrationForm">
+            <div class="user-details">
+                <div class="input-box">
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your name" required>
+                </div>
+                
+                <div class="input-box">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="input-box">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="input-box">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" placeholder="Enter your number" required pattern="[0-9]{10}">
+                    <div class="error-msg" id="phoneError">Please enter a valid 10-digit number.</div>
+                </div>
+
+                <div class="input-box">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="weight" placeholder="e.g. 70" step="0.1" required>
+                </div>
+
+                <div class="input-box">
+                    <label>Height (cm)</label>
+                    <input type="number" id="height" placeholder="e.g. 175" required>
+                </div>
+                
+                <div class="input-box">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required minlength="6">
+                </div>
+                
+                <div class="input-box">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                    <div class="error-msg" id="passwordError">Passwords do not match!</div>
+                </div>
+            </div>
+
+            <div class="gender-details">
+                <span class="gender-title">Gender</span>
+                <div class="category">
+                    <label><input type="radio" name="gender" value="Male" required> Male</label>
+                    <label><input type="radio" name="gender" value="Female"> Female</label>
+                    <label><input type="radio" name="gender" value="Prefer not to say"> Prefer not to say</label>
+                </div>
+            </div>
+
+            <div class="button">
+                <button type="button" onclick="validateAndRegister()">Register</button>
+            </div>
+
+            <div class="signin-link">
+                Already have an account? <a href="login.html">Sign In</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function validateAndRegister() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const weight = document.getElementById('weight').value.trim();
+            const height = document.getElementById('height').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            const genderOptions = document.getElementsByName('gender');
+            let selectedGender = null;
+            for (let i = 0; i < genderOptions.length; i++) {
+                if (genderOptions[i].checked) {
+                    selectedGender = genderOptions[i].value;
+                    break;
+                }
+            }
+
+            const phoneError = document.getElementById('phoneError');
+            const passwordError = document.getElementById('passwordError');
+            
+            phoneError.style.display = 'none';
+            passwordError.style.display = 'none';
+
+            // Validating all fields including new Weight and Height
+            if (!fullName || !username || !email || !phone || !weight || !height || !password || !confirmPassword || !selectedGender) {
+                alert("Please fill in all the details, including your height and weight.");
+                return;
+            }
+
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phone.match(phoneRegex)) {
+                phoneError.style.display = 'block';
+                document.getElementById('phone').focus();
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                passwordError.style.display = 'block';
+                document.getElementById('confirmPassword').focus();
+                return;
+            }
+
+            // You can now use 'weight' and 'height' variables to calculate BMI or suggest exercises
+            alert("Registration Successful!\nWeight: " + weight + "kg, Height: " + height + "cm\nRedirecting to Login Page...");
+
+            window.location.href = "login.html";
+        }
+    </script>
+
+</body>
+</html>

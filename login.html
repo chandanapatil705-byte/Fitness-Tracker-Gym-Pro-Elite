@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-card { background-color: #ffffff; width: 100%; max-width: 400px; padding: 50px 40px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border-top: 4px solid #b156ff; }
+        h1 { text-align: center; font-size: 32px; color: #333333; margin-bottom: 40px; font-weight: 700; }
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; font-size: 12px; color: #666666; margin-bottom: 5px; }
+        .input-wrapper { display: flex; align-items: center; border-bottom: 2px solid #eeeeee; padding-bottom: 8px; transition: border-color 0.3s; }
+        .input-wrapper:focus-within { border-bottom: 2px solid #b156ff; }
+        .input-wrapper i { color: #cccccc; font-size: 16px; margin-right: 15px; }
+        .input-wrapper input { border: none; outline: none; width: 100%; font-size: 14px; color: #333; background: transparent; }
+        .input-wrapper input::placeholder { color: #bbbbbb; }
+        .forgot-password { text-align: right; margin-top: -10px; margin-bottom: 30px; }
+        
+        /* Link styling */
+        .forgot-password a { font-size: 12px; color: #888888; text-decoration: none; transition: color 0.3s; }
+        .forgot-password a:hover { color: #b156ff; }
+        
+        .login-btn { width: 100%; padding: 14px; border: none; border-radius: 25px; background: linear-gradient(to right, #6dd5ed, #d24dff); color: white; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 4px 15px rgba(210, 77, 255, 0.3); transition: transform 0.2s; }
+        .login-btn:hover { transform: translateY(-2px); }
+        .social-signup-text { text-align: center; font-size: 12px; color: #888888; margin: 30px 0 20px; }
+        .social-icons { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
+        .social-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; text-decoration: none; font-size: 18px; transition: opacity 0.3s; cursor: pointer; }
+        .social-btn:hover { opacity: 0.8; }
+        .fb { background-color: #3b5998; }
+        .tw { background-color: #4facfe; }
+        .go { background-color: #ea4335; }
+        .bottom-signup { text-align: center; margin-top: 50px; }
+        .bottom-signup p { font-size: 12px; color: #888888; margin-bottom: 5px; }
+        
+        /* Link styling */
+        .bottom-signup a { font-size: 12px; color: #333333; text-decoration: none; font-weight: 600; cursor: pointer; }
+        .bottom-signup a:hover { color: #b156ff; }
+        
+        @media (max-width: 480px) { body { background-color: #ffffff; } .login-card { box-shadow: none; border-radius: 0; padding: 40px 20px; } }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h1>Login</h1>
+
+        <div class="input-group">
+            <label>Username</label>
+            <div class="input-wrapper">
+                <i class="far fa-user"></i>
+                <input type="text" id="username" placeholder="Type your username">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Type your password">
+            </div>
+        </div>
+
+        <div class="forgot-password">
+            <a href="forgot.html">Forgot password?</a>
+        </div>
+
+        <button class="login-btn" onclick="handleLogin()">LOGIN</button>
+
+        <p class="social-signup-text">Or Sign Up Using</p>
+        
+        <div class="social-icons">
+            <a onclick="socialLogin('Facebook')" class="social-btn fb"><i class="fab fa-facebook-f"></i></a>
+            <a onclick="socialLogin('Twitter')" class="social-btn tw"><i class="fab fa-twitter"></i></a>
+            <a onclick="socialLogin('Google')" class="social-btn go"><i class="fab fa-google"></i></a>
+        </div>
+
+        <div class="bottom-signup">
+            <p>Or Sign Up Using</p>
+            <a href="registration.html">SIGN UP</a>
+        </div>
+    </div>
+
+    <script>
+       // Main Login Function
+function handleLogin() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+
+    if (user === "" || pass === "") {
+        alert("Please enter both Username and Password!");
+    } else {
+        alert("Login Successful! Welcome, " + user + ". \n(Redirecting to dashboard...)");
+        
+        // Niche di gayi line se '//' hata diya gaya hai
+        window.location.href = "dashboard.html"; 
+    }
+}
+
+        // Social Media Login Function
+        function socialLogin(platform) {
+            alert("Redirecting to " + platform + " authentication page...");
+        }
+    </script>
+</body>
+</html>
